@@ -1,28 +1,27 @@
 'use client';
 import Link from 'next/link';
-import { LayoutGrid, Lock } from 'lucide-react';
+import { usePathname } from 'next/navigation';
+import { motion } from 'framer-motion';
 
 export default function NavBar() {
+  const pathname = usePathname();
+
   return (
-    <nav className="fixed top-6 left-0 w-full z-50 flex justify-center px-4">
-      <div className="bento-card rounded-full px-5 py-2.5 flex items-center gap-6 shadow-2xl">
-        <Link href="/" className="flex items-center gap-2 group">
-          <div className="bg-white/10 p-1.5 rounded-md text-white group-hover:bg-primary group-hover:text-black transition-colors">
-            <LayoutGrid size={16} />
-          </div>
-          <span className="font-bold text-sm tracking-tight">THE_LEDGER</span>
+    <nav className="fixed left-0 top-0 h-screen w-20 border-r border-border flex flex-col items-center justify-between py-10 z-50 bg-background">
+      <Link href="/" className="font-bold text-xl tracking-tighter -rotate-90 py-4">
+        SNV.
+      </Link>
+      
+      <div className="flex flex-col gap-12 font-mono text-[10px] uppercase tracking-[0.3em] -rotate-90">
+        <Link href="/" className={pathname === '/' ? 'text-accent' : 'text-white/40 hover:text-white transition-colors'}>
+          Index
         </Link>
-
-        <div className="w-[1px] h-4 bg-white/10" />
-
-        <div className="flex items-center gap-4 text-xs font-mono">
-          <Link href="/" className="text-white hover:text-primary transition-colors">Journal</Link>
-          <span className="text-subtle cursor-not-allowed">Analytics</span>
-          <Link href="/login" className="text-subtle hover:text-white transition-colors" title="Admin">
-            <Lock size={12} />
-          </Link>
-        </div>
+        <Link href="/dashboard" className={pathname === '/dashboard' ? 'text-accent' : 'text-white/40 hover:text-white transition-colors'}>
+          Admin
+        </Link>
       </div>
+
+      <div className="w-1 h-1 bg-white rounded-full animate-pulse" />
     </nav>
   );
 }

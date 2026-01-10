@@ -9,25 +9,16 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        background: "#030303", // Noir Profond
-        surface: "#0F0F11",    // Gris Anthracite très sombre
-        primary: "#3B82F6",    // Bleu Électrique
-        accent: "#8B5CF6",     // Violet Néon
-        success: "#10B981",    // Vert Signal
-        danger: "#EF4444",     // Rouge Alerte
-        text: "#EDEDED",
-        subtle: "#52525B",     // Gris Zinc
+        background: "#0a0a0a",
+        foreground: "#ffffff",
+        accent: "#3b82f6", // Bleu électrique
+        muted: "#1a1a1a",
+        border: "#262626",
       },
       fontFamily: {
         sans: ['var(--font-inter)'],
         mono: ['var(--font-jetbrains)'],
       },
-      backgroundImage: {
-        'grid-pattern': "linear-gradient(to right, #1f1f1f 1px, transparent 1px), linear-gradient(to bottom, #1f1f1f 1px, transparent 1px)",
-      },
-      animation: {
-        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-      }
     },
   },
   plugins: [],
