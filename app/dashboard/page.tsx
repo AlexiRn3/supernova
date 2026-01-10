@@ -1,85 +1,99 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
 export default function Dashboard() {
-  const router = useRouter();
+  const [mounted, setMounted] = useState(false);
   const [form, setForm] = useState({ symbol: '', direction: 'LONG', pnl: '', setup: 'MSNR' });
 
-  // SÉCURITÉ
   useEffect(() => {
+    // Vérification simple côté client
     const token = localStorage.getItem('admin_token');
     if (!token) {
-      router.push('/login');
+      window.location.href = '/login';
+    } else {
+      setMounted(true);
     }
-  }, [router]);
+  }, []);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const tradeData = {
-      ...form, 
-      pnl: Number(form.pnl), 
-      status: Number(form.pnl) > 0 ? 'WIN' : 'LOSS',
-      rr: 0 // Défaut
-    };
+    if (!form.symbol || !form.pnl) return;
 
-    await fetch('/api/trades', { method: 'POST', body: JSON.stringify(tradeData) });
-    alert('Entry Logged.');
-    setForm({ ...form, pnl: '', symbol: '' });
+    await fetch('/api/trades', { 
+      method: 'POST', 
+      body: JSON.stringify({
+        ...form,
+        pnl: Number(form.pnl),
+        status: Number(form.pnl) > 0 ? 'WIN' : 'LOSS',
+        rr: 0
+      }) 
+    });
+    
+    alert('Entry logged successfully.');
+    setForm({ ...form, symbol: '', pnl: '' });
   };
 
+  // Empêche l'affichage flash avant la vérification
+  if (!mounted) return <div className="min-h-screen bg-bg" />;
+
   return (
-    <div className="min-h-screen bg-background text-paper p-8 pt-24 font-mono">
-      <div className="max-w-xl mx-auto border border-subtle p-8 bg-background relative z-10">
-        <div className="flex justify-between items-center mb-8 border-b border-subtle pb-4">
-          <h1 className="text-xl uppercase">New Entry</h1>
-          <Link href="/" className="text-xs text-accent hover:underline">Exit to Site</Link>
+    <div className="min-h-screen bg-bg p-8 pt-32 font-serif text-text max-w-2xl mx-auto">
+      <Link href="/" className="font-mono text-xs uppercase tracking-widest text-muted hover:text-text mb-12 block">
+        ← Back to Journal
+      </Link>
+
+      <h1 className="text-4xl italic mb-12 border-b border-line pb-8">Add New Entry</h1>
+
+      <form onSubmit={submit} className="space-y-8 font-mono text-xs uppercase tracking-widest">
+        
+        <div className="space-y-2">
+          <label className="text-muted">Symbol</label>
+          <input 
+            className="w-full bg-surface border border-line p-4 text-lg text-text focus:border-white outline-none font-serif italic normal-case"
+            value={form.symbol} 
+            onChange={e => setForm({...form, symbol: e.target.value})}
+            placeholder="e.g. NQ1!"
+          />
         </div>
 
-        <form onSubmit={submit} className="flex flex-col gap-6">
-          <div>
-            <label className="text-xs text-subtle uppercase block mb-2">Instrument</label>
+        <div className="grid grid-cols-2 gap-8">
+          <div className="space-y-2">
+            <label className="text-muted">Side</label>
+            <select 
+              className="w-full bg-surface border border-line p-4 outline-none appearance-none cursor-pointer hover:border-muted"
+              value={form.direction} 
+              onChange={e => setForm({...form, direction: e.target.value})}
+            >
+              <option value="LONG">LONG</option>
+              <option value="SHORT">SHORT</option>
+            </select>
+          </div>
+          <div className="space-y-2">
+            <label className="text-muted">Realized PnL</label>
             <input 
-              className="w-full bg-white/5 border border-subtle p-3 outline-none focus:border-accent text-paper"
-              value={form.symbol} onChange={e => setForm({...form, symbol: e.target.value})} placeholder="NQ"
+              type="number"
+              className="w-full bg-surface border border-line p-4 text-text focus:border-white outline-none"
+              value={form.pnl} 
+              onChange={e => setForm({...form, pnl: e.target.value})}
+              placeholder="0.00"
             />
           </div>
+        </div>
 
-          <div className="grid grid-cols-2 gap-4">
-             <div>
-              <label className="text-xs text-subtle uppercase block mb-2">Side</label>
-              <select 
-                className="w-full bg-white/5 border border-subtle p-3 outline-none focus:border-accent text-paper"
-                value={form.direction} onChange={e => setForm({...form, direction: e.target.value})}
-              >
-                <option value="LONG">LONG</option>
-                <option value="SHORT">SHORT</option>
-              </select>
-            </div>
-            <div>
-              <label className="text-xs text-subtle uppercase block mb-2">PnL</label>
-              <input 
-                type="number"
-                className="w-full bg-white/5 border border-subtle p-3 outline-none focus:border-accent text-paper"
-                value={form.pnl} onChange={e => setForm({...form, pnl: e.target.value})} placeholder="0.00"
-              />
-            </div>
-          </div>
-          
-           <div>
-            <label className="text-xs text-subtle uppercase block mb-2">Setup</label>
-            <input 
-              className="w-full bg-white/5 border border-subtle p-3 outline-none focus:border-accent text-paper"
-              value={form.setup} onChange={e => setForm({...form, setup: e.target.value})}
-            />
-          </div>
+        <div className="space-y-2">
+          <label className="text-muted">Setup / Notes</label>
+          <input 
+            className="w-full bg-surface border border-line p-4 text-text focus:border-white outline-none"
+            value={form.setup} 
+            onChange={e => setForm({...form, setup: e.target.value})}
+          />
+        </div>
 
-          <button className="bg-accent text-black font-bold uppercase py-4 hover:bg-white transition-colors mt-4">
-            Commit Data
-          </button>
-        </form>
-      </div>
+        <button className="w-full bg-text text-bg py-5 hover:bg-white transition-colors mt-8 font-bold">
+          Commit Record
+        </button>
+      </form>
     </div>
   );
 }
