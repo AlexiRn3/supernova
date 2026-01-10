@@ -1,52 +1,69 @@
 'use client';
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 
 export default function LoginPage() {
   const [password, setPassword] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(false);
+  const router = useRouter();
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
-    
-    // On simule un petit délai pour la fluidité
-    setTimeout(() => {
-      if (password === 'lucid2026') {
-        localStorage.setItem('isLoggedIn', 'true');
-        window.location.href = '/dashboard';
-      } else {
-        setIsLoading(false);
-        alert('Accès refusé');
-      }
-    }, 800);
+    const res = await fetch('/api/login', {
+      method: 'POST',
+      body: JSON.stringify({ password }),
+    });
+
+    if (res.ok) {
+      router.push('/dashboard');
+    } else {
+      setError(true);
+      setPassword('');
+    }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-6 bg-background">
-      <motion.div 
-        initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}
-        className="glass p-10 rounded-[40px] w-full max-w-md shadow-2xl"
-      >
-        <h2 className="text-3xl font-bold text-center mb-8">Authentification</h2>
-        <form onSubmit={handleLogin} className="space-y-6">
-          <input 
-            type="password" 
-            placeholder="Clé d'accès" 
-            className="w-full bg-white/5 border border-white/10 p-5 rounded-2xl outline-none focus:border-primary transition-all text-center text-xl"
+    <main className="min-h-screen flex flex-col justify-center px-6 md:px-12 bg-background">
+      <form onSubmit={handleSubmit} className="max-w-4xl w-full mx-auto">
+        <label htmlFor="pwd" className="block text-sm font-mono uppercase tracking-widest text-gray-500 mb-8">
+          Identify Yourself
+        </label>
+        
+        <div className="relative group">
+          <input
+            id="pwd"
+            type="password"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={(e) => { setError(false); setPassword(e.target.value); }}
+            placeholder="ACCESS KEY"
+            className="w-full bg-transparent text-5xl md:text-8xl font-bold tracking-tighter text-white placeholder:text-neutral focus:outline-none border-b border-neutral focus:border-white transition-colors py-4 uppercase"
             autoFocus
           />
-          <button 
-            type="submit" 
-            disabled={isLoading}
-            className="w-full bg-white text-black p-5 rounded-2xl font-bold hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50"
+          <motion.div 
+            initial={false}
+            animate={{ width: error ? '100%' : '0%' }}
+            className="absolute bottom-0 left-0 h-[1px] bg-accent"
+          />
+        </div>
+
+        {error && (
+          <motion.p 
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mt-4 text-accent font-mono text-sm uppercase tracking-widest"
           >
-            {isLoading ? "Vérification..." : "Entrer dans le système"}
-          </button>
-        </form>
-      </motion.div>
-    </div>
+            Access Denied // Invalid Key
+          </motion.p>
+        )}
+
+        <button 
+          type="submit" 
+          className="mt-12 text-sm font-mono uppercase tracking-widest text-gray-500 hover:text-white transition-colors flex items-center gap-2"
+        >
+          [ Enter Protocol ]
+        </button>
+      </form>
+    </main>
   );
 }

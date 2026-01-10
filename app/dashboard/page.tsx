@@ -1,66 +1,116 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 export default function Dashboard() {
-  const [isAuth, setIsAuth] = useState(false);
   const router = useRouter();
-  const [form, setForm] = useState({ symbol: '', direction: 'LONG', pnl: '', setup: 'MSNR' });
-
-  useEffect(() => {
-    const auth = localStorage.getItem('isLoggedIn');
-    if (auth !== 'true') {
-      router.replace('/login');
-    } else {
-      setIsAuth(true);
-    }
-  }, [router]);
-
-  if (!isAuth) return null; // Empêche le flash de contenu avant redirection
+  const [formData, setFormData] = useState({
+    symbol: '',
+    direction: 'LONG',
+    setup: '',
+    entryPrice: '',
+    exitPrice: '',
+    pnl: '',
+    date: new Date().toISOString().split('T')[0]
+  });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     await fetch('/api/trades', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ...form, pnl: Number(form.pnl), status: Number(form.pnl) >= 0 ? 'WIN' : 'LOSS' }),
+      body: JSON.stringify({
+        ...formData,
+        entryPrice: Number(formData.entryPrice),
+        exitPrice: Number(formData.exitPrice),
+        pnl: Number(formData.pnl),
+      }),
     });
-    setForm({ ...form, symbol: '', pnl: '' });
-    alert('Trade ajouté');
+    router.push('/'); // Retour à l'index après ajout
   };
 
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const inputStyle = "w-full bg-transparent border-b border-neutral focus:border-white text-white text-xl md:text-2xl font-bold py-4 focus:outline-none transition-colors rounded-none";
+  const labelStyle = "text-xs font-mono uppercase tracking-widest text-gray-500 mb-2 block";
+
   return (
-    <div className="pl-20 p-12">
-      <h1 className="text-4xl font-bold mb-12 uppercase">Terminal_Input</h1>
-      <form onSubmit={handleSubmit} className="max-w-md flex flex-col gap-8">
-        <div className="flex flex-col gap-2">
-          <label className="font-mono text-[10px] text-white/40 uppercase">Instrument</label>
-          <input 
-            className="bg-transparent border-b border-border py-4 outline-none focus:border-white"
-            value={form.symbol} onChange={e => setForm({...form, symbol: e.target.value})}
-          />
-        </div>
-        <div className="flex flex-col gap-2">
-          <label className="font-mono text-[10px] text-white/40 uppercase">Side</label>
-          <select 
-            className="bg-transparent border-b border-border py-4 outline-none appearance-none"
-            value={form.direction} onChange={e => setForm({...form, direction: e.target.value})}
-          >
-            <option value="LONG">LONG</option>
-            <option value="SHORT">SHORT</option>
-          </select>
-        </div>
-        <div className="flex flex-col gap-2">
-          <label className="font-mono text-[10px] text-white/40 uppercase">Result (PnL)</label>
-          <input 
-            type="number" className="bg-transparent border-b border-border py-4 outline-none"
-            value={form.pnl} onChange={e => setForm({...form, pnl: e.target.value})}
-          />
-        </div>
-        <button type="submit" className="border border-white p-6 font-mono text-xs uppercase hover:bg-white hover:text-black transition-all">
-          Execute_Commit
-        </button>
-      </form>
-    </div>
+    <main className="min-h-screen pt-32 pb-20 px-6 md:px-12 bg-background">
+      <div className="max-w-3xl mx-auto">
+        <header className="mb-20">
+            <h1 className="text-6xl md:text-7xl font-bold tracking-tighter mb-4">NEW ENTRY</h1>
+            <p className="font-mono text-gray-500">Record execution data into the ledger.</p>
+        </header>
+
+        <form onSubmit={handleSubmit} className="space-y-12">
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+            <div>
+              <label className={labelStyle}>Instrument / Symbol</label>
+              <input name="symbol" placeholder="BTCUSDT" onChange={handleChange} className={inputStyle} required />
+            </div>
+            
+            <div>
+              <label className={labelStyle}>Date</label>
+              <input name="date" type="date" value={formData.date} onChange={handleChange} className={inputStyle} required />
+            </div>
+          </div>
+
+          <div>
+             <label className={labelStyle}>Direction</label>
+             <div className="flex gap-8 pt-4">
+                {['LONG', 'SHORT'].map((dir) => (
+                  <label key={dir} className="flex items-center gap-3 cursor-pointer group">
+                    <input 
+                      type="radio" 
+                      name="direction" 
+                      value={dir} 
+                      checked={formData.direction === dir} 
+                      onChange={handleChange}
+                      className="hidden"
+                    />
+                    <span className={`w-4 h-4 border border-white flex items-center justify-center transition-colors ${formData.direction === dir ? 'bg-white' : ''}`}>
+                    </span>
+                    <span className={`text-xl font-bold transition-colors ${formData.direction === dir ? 'text-white' : 'text-gray-600 group-hover:text-gray-400'}`}>
+                      {dir}
+                    </span>
+                  </label>
+                ))}
+             </div>
+          </div>
+
+          <div>
+            <label className={labelStyle}>Strategy / Setup</label>
+            <input name="setup" placeholder="Breakout, Reversal..." onChange={handleChange} className={inputStyle} required />
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+            <div>
+              <label className={labelStyle}>Entry Price</label>
+              <input name="entryPrice" type="number" step="any" placeholder="0.00" onChange={handleChange} className={inputStyle} required />
+            </div>
+            <div>
+              <label className={labelStyle}>Exit Price</label>
+              <input name="exitPrice" type="number" step="any" placeholder="0.00" onChange={handleChange} className={inputStyle} required />
+            </div>
+            <div>
+              <label className={labelStyle}>Net PnL ($)</label>
+              <input name="pnl" type="number" step="any" placeholder="0.00" onChange={handleChange} className={inputStyle} required />
+            </div>
+          </div>
+
+          <div className="pt-12">
+            <button 
+              type="submit" 
+              className="w-full md:w-auto px-12 py-6 bg-white text-black font-bold text-xl uppercase tracking-tighter hover:bg-accent hover:text-white transition-colors"
+            >
+              Commit Data
+            </button>
+          </div>
+
+        </form>
+      </div>
+    </main>
   );
 }

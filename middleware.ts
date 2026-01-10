@@ -1,37 +1,27 @@
-// Fichier: middleware.ts
-import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
+import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
 
 export function middleware(request: NextRequest) {
-  // 1. Récupérer le cookie de session
-  const userId = request.cookies.get("userId")?.value;
-  
-  // 2. Définir les chemins actuels
-  const path = request.nextUrl.pathname;
+  // On récupère le cookie d'authentification
+  const authCookie = request.cookies.get('supernova_auth');
+  const isAuthenticated = authCookie?.value === 'true';
 
-  // 3. LOGIQUE DE REDIRECTION
+  const isLoginPage = request.nextUrl.pathname === '/login';
+  const isDashboard = request.nextUrl.pathname.startsWith('/dashboard');
 
-  // Cas A : L'utilisateur est CONNECTÉ et tente d'accéder aux pages publiques (Login/Register)
-  // -> On le renvoie vers le Dashboard (ou Admin selon votre logique, ici Dashboard par défaut)
-  const isAuthPage = path.startsWith("/login") || path.startsWith("/register");
-  
-  if (userId && isAuthPage) {
-    return NextResponse.redirect(new URL("/dashboard", request.url));
+  // Cas 1 : On est sur le dashboard mais sans auth -> Redirection Login
+  if (isDashboard && !isAuthenticated) {
+    return NextResponse.redirect(new URL('/login', request.url));
   }
 
-  // Cas B : L'utilisateur n'est PAS connecté et tente d'accéder aux pages protégées (Admin/Dashboard)
-  // -> On le renvoie vers Login
-  const isProtectedPage = path.startsWith("/dashboard") || path.startsWith("/admin");
-
-  if (!userId && isProtectedPage) {
-    return NextResponse.redirect(new URL("/login", request.url));
+  // Cas 2 : On est sur le login mais DÉJÀ auth -> Redirection Dashboard
+  if (isLoginPage && isAuthenticated) {
+    return NextResponse.redirect(new URL('/dashboard', request.url));
   }
 
-  // Sinon, on laisse passer
   return NextResponse.next();
 }
 
-// Configuration : Le middleware ne s'active que sur les chemins pertinents (pour ne pas ralentir les images, api, etc.)
 export const config = {
-  matcher: ["/dashboard/:path*", "/admin/:path*", "/login", "/register"],
+  matcher: ['/dashboard/:path*', '/login'],
 };

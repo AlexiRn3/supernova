@@ -2,7 +2,9 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Trade } from '@/lib/types';
-import { TrendingUp, TrendingDown, Activity } from 'lucide-react';
+import StatsCard from '@/components/StatsCard';
+import TradeList from '@/components/TradeList';
+import { ArrowDownRight } from 'lucide-react';
 
 export default function Home() {
   const [trades, setTrades] = useState<Trade[]>([]);
@@ -14,61 +16,77 @@ export default function Home() {
   const totalPnL = trades.reduce((acc, trade) => acc + trade.pnl, 0);
 
   return (
-    <main className="min-h-screen p-6 md:p-24">
-      {/* Aurora Background Blobs */}
-      <div className="aurora-bg">
-        <div className="blob bg-primary top-0 -left-20 animate-float"></div>
-        <div className="blob bg-secondary bottom-0 right-0 animate-float" style={{ animationDelay: '-2s' }}></div>
-      </div>
-
-      <header className="max-w-6xl mx-auto mb-20 text-center">
-        <motion.h1 
-          initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}
-          className="text-6xl md:text-8xl font-bold tracking-tighter bg-clip-text text-transparent bg-gradient-to-b from-white to-white/40"
-        >
-          Supernova.
-        </motion.h1>
-        <p className="text-white/40 mt-4 font-medium tracking-widest uppercase text-xs">MSNR Trading Journal</p>
-      </header>
-
-      <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6">
-        {/* Stat Card */}
-        <div className="glass rounded-3xl p-8 flex flex-col justify-between aspect-video md:aspect-square">
-          <Activity className="text-primary" size={32} />
-          <div>
-            <p className="text-white/40 text-xs uppercase font-bold tracking-widest mb-2">Total Net PnL</p>
-            <h2 className={`text-5xl font-bold ${totalPnL >= 0 ? 'text-white' : 'text-red-400'}`}>
-              {totalPnL > 0 ? '+' : ''}{totalPnL}$
-            </h2>
+    <main className="min-h-screen pb-40">
+      
+      {/* 1. HERO SECTION - Massive Typography */}
+      <section className="pt-32 pb-20 px-6 md:px-12 border-b border-neutral">
+        <div className="max-w-[1800px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12">
+          <div className="lg:col-span-8">
+            <motion.h1 
+              initial={{ y: 100, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+              className="text-display font-bold tracking-tighter uppercase break-words"
+            >
+              Super<br/><span className="text-accent">Nova</span>
+            </motion.h1>
           </div>
-        </div>
-
-        {/* Trade List Container */}
-        <div className="glass rounded-3xl p-8 md:col-span-2 overflow-hidden">
-          <h3 className="text-sm font-bold uppercase tracking-widest mb-6 opacity-40">Recent Executions</h3>
-          <div className="space-y-4">
-            {trades.map((trade, i) => (
-              <motion.div 
-                key={i} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.1 }}
-                className="flex items-center justify-between p-4 bg-white/5 rounded-2xl hover:bg-white/10 transition-colors"
-              >
-                <div className="flex items-center gap-4">
-                  <div className={`p-2 rounded-full ${trade.pnl >= 0 ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>
-                    {trade.pnl >= 0 ? <TrendingUp size={16} /> : <TrendingDown size={16} />}
-                  </div>
-                  <div>
-                    <p className="font-bold">{trade.symbol}</p>
-                    <p className="text-[10px] text-white/40 uppercase">{trade.direction}</p>
-                  </div>
-                </div>
-                <p className={`font-mono font-bold ${trade.pnl >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-                  {trade.pnl > 0 ? '+' : ''}{trade.pnl}$
+          <div className="lg:col-span-4 flex flex-col justify-end items-start">
+             <div className="mb-8 max-w-xs">
+                <p className="text-xl leading-tight font-medium">
+                  Journal de trading algorithmique & analyse de performance en temps réel.
                 </p>
-              </motion.div>
-            ))}
+             </div>
+             <div className="w-full border-t border-white pt-4 flex justify-between items-end">
+                <span className="text-sm font-mono text-gray-500 uppercase">Status</span>
+                <span className="text-sm font-mono uppercase flex items-center gap-2">
+                  <span className="w-2 h-2 bg-accent rounded-full animate-pulse"></span>
+                  Live Feed
+                </span>
+             </div>
           </div>
         </div>
-      </div>
+      </section>
+
+      {/* 2. DATA GRID - Asymmetric Layout */}
+      <section className="px-6 md:px-12 border-b border-neutral">
+         <div className="max-w-[1800px] mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 divide-y md:divide-y-0 md:divide-x divide-neutral">
+            
+            {/* KPI 1 - Le plus important */}
+            <div className="py-12 md:pr-12">
+              <StatsCard title="Net Profit" value={`${totalPnL > 0 ? '+' : ''}${totalPnL}`} isCurrency />
+            </div>
+
+            {/* KPI 2 */}
+            <div className="py-12 md:px-12">
+               <StatsCard title="Total Executions" value={trades.length.toString()} />
+            </div>
+            
+            {/* KPI 3 */}
+            <div className="py-12 md:px-12">
+               <StatsCard title="Win Rate" value="68.4" sub="%" />
+            </div>
+
+            {/* Decoration / Info */}
+            <div className="py-12 md:pl-12 flex flex-col justify-between">
+               <ArrowDownRight size={48} strokeWidth={1} className="text-accent" />
+               <p className="text-sm text-gray-500 font-mono mt-4">
+                 Données brutes extraites directement du protocole d'exécution.
+                 <br/>Aucun filtre. Transparence totale.
+               </p>
+            </div>
+         </div>
+      </section>
+
+      {/* 3. THE LIST - Minimalist Table */}
+      <section className="pt-20 px-6 md:px-12 max-w-[1800px] mx-auto">
+        <div className="flex items-end justify-between mb-8 border-b border-white pb-2">
+           <h2 className="text-6xl font-bold tracking-tighter">LATEST ENTRIES</h2>
+           <span className="font-mono text-sm text-gray-500 mb-2">001 — {trades.length.toString().padStart(3, '0')}</span>
+        </div>
+        <TradeList trades={trades} />
+      </section>
+
     </main>
   );
 }

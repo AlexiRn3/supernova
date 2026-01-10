@@ -9,25 +9,21 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        background: "#050505",
-        surface: "rgba(255, 255, 255, 0.03)",
-        primary: "#6366f1", // Indigo
-        secondary: "#a855f7", // Purple
-        accent: "#ec4899", // Pink
+        background: "#000000", // Noir pur
+        foreground: "#ffffff", // Blanc pur
+        neutral: "#1a1a1a",    // Gris très sombre pour les éléments secondaires
+        accent: "#ff3333",     // Rouge Suisse International
       },
-      animation: {
-        'gradient-x': 'gradient-x 15s ease infinite',
-        'float': 'float 6s ease-in-out infinite',
+      fontFamily: {
+        sans: ['var(--font-inter)', 'Helvetica', 'Arial', 'sans-serif'], // Le style Suisse repose sur du sans-serif propre
+        mono: ['var(--font-jetbrains)', 'monospace'],
       },
-      keyframes: {
-        'gradient-x': {
-          '0%, 100%': { 'background-size': '200% 200%', 'background-position': 'left center' },
-          '50%': { 'background-size': '200% 200%', 'background-position': 'right center' },
-        },
-        'float': {
-          '0%, 100%': { transform: 'translateY(0px)' },
-          '50%': { transform: 'translateY(-20px)' },
-        }
+      fontSize: {
+        'display': ['8rem', { lineHeight: '0.9', letterSpacing: '-0.04em' }], // Pour les titres géants
+        'huge': ['4rem', { lineHeight: '1', letterSpacing: '-0.02em' }],
+      },
+      backgroundImage: {
+        'grid-pattern': "linear-gradient(to right, #1a1a1a 1px, transparent 1px), linear-gradient(to bottom, #1a1a1a 1px, transparent 1px)",
       }
     },
   },

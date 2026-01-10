@@ -5,25 +5,35 @@ interface Props {
   title: string;
   value: string;
   sub?: string;
-  delay?: number;
-  isPositive?: boolean;
+  isCurrency?: boolean;
 }
 
-export default function StatsCard({ title, value, sub, delay = 0, isPositive }: Props) {
+export default function StatsCard({ title, value, sub, isCurrency }: Props) {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay }}
-      className="bg-surface border border-white/5 p-6 rounded-2xl backdrop-blur-sm hover:border-white/10 transition-colors"
-    >
-      <h3 className="text-muted text-sm uppercase tracking-wider font-mono mb-2">{title}</h3>
-      <div className={`text-4xl font-bold font-mono tracking-tight ${
-        isPositive === true ? 'text-success' : isPositive === false ? 'text-danger' : 'text-white'
-      }`}>
-        {value}
+    <div className="flex flex-col h-full justify-between group">
+      <h3 className="text-sm font-mono uppercase tracking-widest text-gray-500 mb-4 flex items-center gap-2">
+        <span className="w-1 h-1 bg-white"></span>
+        {title}
+      </h3>
+      
+      <div>
+        <div className="flex items-baseline">
+          <motion.span 
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-6xl md:text-7xl font-bold tracking-tighter text-white group-hover:text-transparent group-hover:text-outline transition-all duration-500"
+            style={{ WebkitTextStroke: '1px white' }} // Fallback pour l'effet outline
+          >
+            {value}
+          </motion.span>
+          {(sub || isCurrency) && (
+            <span className="text-2xl ml-1 font-light text-gray-400">
+              {isCurrency ? '$' : sub}
+            </span>
+          )}
+        </div>
       </div>
-      {sub && <p className="text-xs text-muted mt-2">{sub}</p>}
-    </motion.div>
+    </div>
   );
 }
