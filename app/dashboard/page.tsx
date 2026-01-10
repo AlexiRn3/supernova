@@ -3,23 +3,21 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 
 export default function Dashboard() {
-  const [mounted, setMounted] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [form, setForm] = useState({ symbol: '', direction: 'LONG', pnl: '', setup: 'MSNR' });
 
   useEffect(() => {
-    // Vérification simple côté client
+    // Vérification au montage
     const token = localStorage.getItem('admin_token');
-    if (!token) {
-      window.location.href = '/login';
+    if (token !== 'ACCESS_GRANTED') {
+      window.location.replace('/login');
     } else {
-      setMounted(true);
+      setIsAuthenticated(true);
     }
   }, []);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.symbol || !form.pnl) return;
-
     await fetch('/api/trades', { 
       method: 'POST', 
       body: JSON.stringify({
@@ -29,71 +27,64 @@ export default function Dashboard() {
         rr: 0
       }) 
     });
-    
-    alert('Entry logged successfully.');
+    alert('Entry Logged');
     setForm({ ...form, symbol: '', pnl: '' });
   };
 
-  // Empêche l'affichage flash avant la vérification
-  if (!mounted) return <div className="min-h-screen bg-bg" />;
+  // Si pas authentifié, on n'affiche RIEN (pour éviter le flash avant la redirection)
+  if (!isAuthenticated) return null;
 
   return (
-    <div className="min-h-screen bg-bg p-8 pt-32 font-serif text-text max-w-2xl mx-auto">
-      <Link href="/" className="font-mono text-xs uppercase tracking-widest text-muted hover:text-text mb-12 block">
-        ← Back to Journal
-      </Link>
-
-      <h1 className="text-4xl italic mb-12 border-b border-line pb-8">Add New Entry</h1>
-
-      <form onSubmit={submit} className="space-y-8 font-mono text-xs uppercase tracking-widest">
-        
-        <div className="space-y-2">
-          <label className="text-muted">Symbol</label>
-          <input 
-            className="w-full bg-surface border border-line p-4 text-lg text-text focus:border-white outline-none font-serif italic normal-case"
-            value={form.symbol} 
-            onChange={e => setForm({...form, symbol: e.target.value})}
-            placeholder="e.g. NQ1!"
-          />
+    <div className="min-h-screen bg-background p-6 md:p-12 pt-32 flex justify-center">
+      <div className="bento-card w-full max-w-2xl p-8 rounded-3xl">
+        <div className="flex justify-between items-center mb-8 border-b border-white/10 pb-4">
+          <h1 className="text-2xl font-bold">New Entry</h1>
+          <Link href="/" className="text-xs text-primary hover:underline">Exit</Link>
         </div>
 
-        <div className="grid grid-cols-2 gap-8">
-          <div className="space-y-2">
-            <label className="text-muted">Side</label>
-            <select 
-              className="w-full bg-surface border border-line p-4 outline-none appearance-none cursor-pointer hover:border-muted"
-              value={form.direction} 
-              onChange={e => setForm({...form, direction: e.target.value})}
-            >
-              <option value="LONG">LONG</option>
-              <option value="SHORT">SHORT</option>
-            </select>
-          </div>
-          <div className="space-y-2">
-            <label className="text-muted">Realized PnL</label>
+        <form onSubmit={submit} className="flex flex-col gap-6">
+          <div>
+            <label className="text-xs text-subtle uppercase mb-2 block">Symbol</label>
             <input 
-              type="number"
-              className="w-full bg-surface border border-line p-4 text-text focus:border-white outline-none"
-              value={form.pnl} 
-              onChange={e => setForm({...form, pnl: e.target.value})}
-              placeholder="0.00"
+              className="w-full bg-black/50 border border-white/10 rounded-xl p-3 focus:border-primary outline-none"
+              value={form.symbol} onChange={e => setForm({...form, symbol: e.target.value})} placeholder="NQ"
             />
           </div>
-        </div>
 
-        <div className="space-y-2">
-          <label className="text-muted">Setup / Notes</label>
-          <input 
-            className="w-full bg-surface border border-line p-4 text-text focus:border-white outline-none"
-            value={form.setup} 
-            onChange={e => setForm({...form, setup: e.target.value})}
-          />
-        </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="text-xs text-subtle uppercase mb-2 block">Side</label>
+              <select 
+                className="w-full bg-black/50 border border-white/10 rounded-xl p-3 outline-none"
+                value={form.direction} onChange={e => setForm({...form, direction: e.target.value})}
+              >
+                <option value="LONG">LONG</option>
+                <option value="SHORT">SHORT</option>
+              </select>
+            </div>
+            <div>
+              <label className="text-xs text-subtle uppercase mb-2 block">PnL ($)</label>
+              <input 
+                type="number"
+                className="w-full bg-black/50 border border-white/10 rounded-xl p-3 focus:border-primary outline-none"
+                value={form.pnl} onChange={e => setForm({...form, pnl: e.target.value})} placeholder="0.00"
+              />
+            </div>
+          </div>
 
-        <button className="w-full bg-text text-bg py-5 hover:bg-white transition-colors mt-8 font-bold">
-          Commit Record
-        </button>
-      </form>
+          <div>
+            <label className="text-xs text-subtle uppercase mb-2 block">Setup</label>
+            <input 
+              className="w-full bg-black/50 border border-white/10 rounded-xl p-3 focus:border-primary outline-none"
+              value={form.setup} onChange={e => setForm({...form, setup: e.target.value})}
+            />
+          </div>
+
+          <button className="bg-primary text-black font-bold py-4 rounded-xl hover:bg-blue-400 transition-colors mt-2">
+            Commit Data
+          </button>
+        </form>
+      </div>
     </div>
   );
 }

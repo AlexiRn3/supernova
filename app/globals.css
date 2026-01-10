@@ -8,35 +8,33 @@
 }
 
 body {
-  background-color: theme('colors.bg');
+  background-color: theme('colors.background');
   color: theme('colors.text');
   overflow-x: hidden;
 }
 
-/* Texture de fond granuleuse omniprésente */
-.texture-overlay {
+/* Background Grid Effect */
+.bg-grid-subtle {
+  background-size: 40px 40px;
+  background-image: theme('backgroundImage.grid-pattern');
+  mask-image: radial-gradient(ellipse at center, black 40%, transparent 80%);
+  opacity: 0.15;
   position: fixed;
-  top: 0; left: 0; width: 100vw; height: 100vh;
+  inset: 0;
   pointer-events: none;
-  z-index: 50;
-  background-image: theme('backgroundImage.noise');
-  opacity: 0.4;
-  mix-blend-mode: overlay;
+  z-index: 0;
 }
 
-/* Animations de texte élégantes */
-.reveal-text {
-  animation: reveal 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  opacity: 0;
-  transform: translateY(100%);
+/* Glassmorphism Card Utility */
+.bento-card {
+  background: rgba(15, 15, 17, 0.6);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  transition: all 0.3s ease;
 }
 
-@keyframes reveal {
-  to { opacity: 1; transform: translateY(0); }
-}
-
-/* Sélection de texte style "Marqueur" */
-::selection {
-  background-color: theme('colors.text');
-  color: theme('colors.bg');
+.bento-card:hover {
+  border-color: rgba(255, 255, 255, 0.15);
+  background: rgba(15, 15, 17, 0.8);
 }

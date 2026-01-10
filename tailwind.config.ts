@@ -9,22 +9,24 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        bg: "#050505",       // Noir Absolu
-        surface: "#0A0A0A",  // Noir Panneau
-        text: "#E5E5E5",     // Blanc Cassé (plus doux)
-        muted: "#525252",    // Gris Pierre
-        accent: "#D4AF37",   // Or Métallique (subtil, pour le profit)
-        loss: "#9F1239",     // Rouge Sang (profond, pour la perte)
-        line: "#1F1F1F",     // Lignes de structure
+        background: "#030303", // Noir Profond
+        surface: "#0F0F11",    // Gris Anthracite très sombre
+        primary: "#3B82F6",    // Bleu Électrique
+        accent: "#8B5CF6",     // Violet Néon
+        success: "#10B981",    // Vert Signal
+        danger: "#EF4444",     // Rouge Alerte
+        text: "#EDEDED",
+        subtle: "#52525B",     // Gris Zinc
       },
       fontFamily: {
-        // On force l'utilisation de polices Serif système pour l'effet "Journal Financier"
-        serif: ['Times New Roman', 'Times', 'serif'], 
-        sans: ['var(--font-inter)', 'Arial', 'sans-serif'],
-        mono: ['var(--font-jetbrains)', 'Courier New', 'monospace'],
+        sans: ['var(--font-inter)'],
+        mono: ['var(--font-jetbrains)'],
       },
       backgroundImage: {
-        'noise': "url('data:image/svg+xml,%3Csvg viewBox=\"0 0 200 200\" xmlns=\"http://www.w3.org/2000/svg\"%3E%3Cfilter id=\"noiseFilter\"%3E%3CfeTurbulence type=\"fractalNoise\" baseFrequency=\"0.8\" numOctaves=\"3\" stitchTiles=\"stitch\"/%3E%3C/filter%3E%3Crect width=\"100%25\" height=\"100%25\" filter=\"url(%23noiseFilter)\" opacity=\"0.05\"/%3E%3C/svg%3E')",
+        'grid-pattern': "linear-gradient(to right, #1f1f1f 1px, transparent 1px), linear-gradient(to bottom, #1f1f1f 1px, transparent 1px)",
+      },
+      animation: {
+        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
       }
     },
   },

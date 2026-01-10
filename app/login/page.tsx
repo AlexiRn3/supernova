@@ -1,20 +1,22 @@
 'use client';
 import { useState } from 'react';
+import Link from 'next/link';
 
 export default function Login() {
   const [pwd, setPwd] = useState('');
-  const [status, setStatus] = useState('idle'); // idle, loading, error
+  const [status, setStatus] = useState('idle');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     setStatus('loading');
 
     setTimeout(() => {
       if (pwd === 'lucid2026') {
-        // Stockage du token
-        localStorage.setItem('admin_token', 'true');
-        // REDIRECTION FORCÉE (Contourne le routeur)
-        window.location.href = '/dashboard';
+        // 1. On set le token
+        localStorage.setItem('admin_token', 'ACCESS_GRANTED');
+        
+        // 2. FORCE RELOAD vers le dashboard (Plus de boucle possible)
+        window.location.replace('/dashboard');
       } else {
         setStatus('error');
         setTimeout(() => setStatus('idle'), 2000);
@@ -23,44 +25,40 @@ export default function Login() {
   };
 
   return (
-    <div className="h-screen w-full bg-bg flex items-center justify-center relative overflow-hidden">
-      {/* Texture */}
-      <div className="texture-overlay" />
+    <div className="min-h-screen flex items-center justify-center bg-background relative overflow-hidden">
+      {/* Background Decor */}
+      <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-primary/10 blur-[120px] rounded-full pointer-events-none" />
 
-      <div className="z-10 w-full max-w-sm p-8 border border-line bg-surface relative">
-        {/* Effet "Ticket" */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-4 bg-bg rounded-full border border-line" />
-        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 w-4 h-4 bg-bg rounded-full border border-line" />
+      <div className="bento-card p-10 rounded-3xl w-full max-w-sm relative z-10 border-white/10">
+        <h1 className="text-xl font-bold mb-2 text-center">Admin Access</h1>
+        <p className="text-subtle text-center text-xs mb-8">Secure Environment</p>
 
-        <h2 className="font-serif text-2xl italic text-center mb-2">Restricted Area</h2>
-        <p className="text-center font-mono text-[10px] uppercase tracking-widest text-muted mb-8">
-          Admin Credentials Required
-        </p>
-
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+        <form onSubmit={handleLogin} className="flex flex-col gap-4">
           <input 
             type="password"
             value={pwd}
             onChange={(e) => setPwd(e.target.value)}
-            placeholder="PASSPHRASE"
-            className="bg-bg border border-line p-4 text-center font-mono text-xs focus:border-text outline-none text-text transition-colors placeholder:text-muted/50"
+            placeholder="Passphrase"
+            className="bg-black/50 border border-white/10 rounded-xl p-4 text-center outline-none focus:border-primary transition-colors text-white"
             autoFocus
           />
           
           <button 
             type="submit"
             disabled={status === 'loading'}
-            className="bg-text text-bg py-4 font-mono text-xs uppercase tracking-widest hover:bg-white transition-colors disabled:opacity-50"
+            className="bg-white text-black font-bold py-4 rounded-xl hover:bg-gray-200 transition-colors disabled:opacity-50"
           >
-            {status === 'loading' ? 'Verifying...' : 'Enter System'}
+            {status === 'loading' ? 'Authenticating...' : 'Enter Dashboard'}
           </button>
         </form>
 
         {status === 'error' && (
-          <div className="absolute -bottom-12 left-0 w-full text-center font-mono text-xs text-loss uppercase animate-pulse">
-            Access Denied
-          </div>
+          <p className="mt-4 text-center text-danger text-xs font-mono uppercase">Invalid Credentials</p>
         )}
+        
+        <Link href="/" className="block mt-6 text-center text-xs text-subtle hover:text-white">
+          ← Return Home
+        </Link>
       </div>
     </div>
   );
