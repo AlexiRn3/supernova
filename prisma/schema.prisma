@@ -12,13 +12,15 @@ datasource db {
 
 model Trade {
   id         String   @id @default(uuid())
-  symbol     String   // Ex: BTCUSDT
-  direction  String   // LONG ou SHORT
-  setup      String   // Ex: Pullback, Breakout
+  symbol     String
+  direction  String
+  setup      String
+  contracts  Float    @default(1) // Nouveau champ ! (Float permet les 0.5 lots)
   entryPrice Float
   exitPrice  Float
   pnl        Float
-  date       String   // Format YYYY-MM-DD (plus simple à gérer que DateTime pour un journal)
+  rr         Float    @default(0)
+  date       String
   
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt

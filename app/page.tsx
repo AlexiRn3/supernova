@@ -1,92 +1,118 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Trade } from '@/lib/types';
-import StatsCard from '@/components/StatsCard';
-import TradeList from '@/components/TradeList';
-import { ArrowDownRight } from 'lucide-react';
+import { Trade } from './api/trades/route';
+import { ArrowUpRight, Plus } from 'lucide-react';
 
 export default function Home() {
   const [trades, setTrades] = useState<Trade[]>([]);
-
+  
   useEffect(() => {
-    fetch('/api/trades').then(res => res.json()).then(setTrades);
+    fetch('/api/trades').then(r => r.json()).then(setTrades);
   }, []);
 
-  const totalPnL = trades.reduce((acc, trade) => acc + trade.pnl, 0);
-
   return (
-    <main className="min-h-screen pb-40">
+    <main className="min-h-screen bg-white text-black font-sans selection:bg-accent selection:text-white">
       
-      {/* 1. HERO SECTION - Massive Typography */}
-      <section className="pt-32 pb-20 px-6 md:px-12 border-b border-neutral">
-        <div className="max-w-[1800px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12">
-          <div className="lg:col-span-8">
-            <motion.h1 
-              initial={{ y: 100, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-              className="text-display font-bold tracking-tighter uppercase break-words"
-            >
-              Super<br/><span className="text-accent">Nova</span>
-            </motion.h1>
+      {/* HEADER GRID */}
+      <div className="grid grid-cols-1 md:grid-cols-12 border-b border-black">
+        {/* Titre Massivement Suisse */}
+        <div className="col-span-1 md:col-span-8 p-6 md:p-12 border-r border-black relative overflow-hidden">
+          <motion.h1 
+            initial={{ y: "100%" }}
+            animate={{ y: 0 }}
+            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+            className="text-huge font-bold tracking-tighter leading-[0.8] uppercase mt-20"
+          >
+            The<br/>Ledger
+          </motion.h1>
+        </div>
+
+        {/* Panneau d'info latéral - Alignement fer à gauche */}
+        <div className="col-span-1 md:col-span-4 p-6 flex flex-col justify-between font-mono text-sm leading-relaxed">
+          <div className="space-y-4">
+            <p>
+              <span className="block text-accent font-bold">PROJET</span>
+              SUPERNOVA / MSNR
+            </p>
+            <p>
+              <span className="block text-accent font-bold">OBJECTIF</span>
+              DOCUMENTATION RIGOUREUSE<br/>
+              TRANSACTIONS FUTURES
+            </p>
           </div>
-          <div className="lg:col-span-4 flex flex-col justify-end items-start">
-             <div className="mb-8 max-w-xs">
-                <p className="text-xl leading-tight font-medium">
-                  Journal de trading algorithmique & analyse de performance en temps réel.
-                </p>
-             </div>
-             <div className="w-full border-t border-white pt-4 flex justify-between items-end">
-                <span className="text-sm font-mono text-gray-500 uppercase">Status</span>
-                <span className="text-sm font-mono uppercase flex items-center gap-2">
-                  <span className="w-2 h-2 bg-accent rounded-full animate-pulse"></span>
-                  Live Feed
-                </span>
-             </div>
+          <div className="mt-20">
+             <div className="w-4 h-4 bg-accent mb-2 animate-pulse"></div>
+             <p className="uppercase">System Status: Active</p>
           </div>
         </div>
-      </section>
+      </div>
 
-      {/* 2. DATA GRID - Asymmetric Layout */}
-      <section className="px-6 md:px-12 border-b border-neutral">
-         <div className="max-w-[1800px] mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 divide-y md:divide-y-0 md:divide-x divide-neutral">
-            
-            {/* KPI 1 - Le plus important */}
-            <div className="py-12 md:pr-12">
-              <StatsCard title="Net Profit" value={`${totalPnL > 0 ? '+' : ''}${totalPnL}`} isCurrency />
-            </div>
+      {/* DATA GRID HEADERS */}
+      <div className="grid grid-cols-12 border-b border-black font-mono text-xs uppercase tracking-widest sticky top-0 bg-white z-10">
+        <div className="col-span-2 p-4 border-r border-black">ID_REF</div>
+        <div className="col-span-4 p-4 border-r border-black">Instrument</div>
+        <div className="col-span-2 p-4 border-r border-black">Setup</div>
+        <div className="col-span-2 p-4 border-r border-black">Date</div>
+        <div className="col-span-2 p-4 text-right">Performance</div>
+      </div>
 
-            {/* KPI 2 */}
-            <div className="py-12 md:px-12">
-               <StatsCard title="Total Executions" value={trades.length.toString()} />
-            </div>
-            
-            {/* KPI 3 */}
-            <div className="py-12 md:px-12">
-               <StatsCard title="Win Rate" value="68.4" sub="%" />
-            </div>
-
-            {/* Decoration / Info */}
-            <div className="py-12 md:pl-12 flex flex-col justify-between">
-               <ArrowDownRight size={48} strokeWidth={1} className="text-accent" />
-               <p className="text-sm text-gray-500 font-mono mt-4">
-                 Données brutes extraites directement du protocole d'exécution.
-                 <br/>Aucun filtre. Transparence totale.
-               </p>
-            </div>
-         </div>
-      </section>
-
-      {/* 3. THE LIST - Minimalist Table */}
-      <section className="pt-20 px-6 md:px-12 max-w-[1800px] mx-auto">
-        <div className="flex items-end justify-between mb-8 border-b border-white pb-2">
-           <h2 className="text-6xl font-bold tracking-tighter">LATEST ENTRIES</h2>
-           <span className="font-mono text-sm text-gray-500 mb-2">001 — {trades.length.toString().padStart(3, '0')}</span>
-        </div>
-        <TradeList trades={trades} />
-      </section>
-
+      {/* DATA ROWS */}
+      <div className="flex flex-col">
+        {trades.map((trade, i) => (
+          <TradeItem key={trade.id} trade={trade} index={i} />
+        ))}
+        {trades.length === 0 && (
+          <div className="p-20 text-center font-mono text-sm border-b border-black">
+            ACQUISITION DES DONNÉES...
+          </div>
+        )}
+      </div>
+      
+      {/* FOOTER SIMPLE */}
+      <footer className="p-4 font-mono text-xs uppercase border-b border-black flex justify-between">
+        <span>© 2026 MSNR Academy</span>
+        <span>Zurich — Montreal</span>
+      </footer>
     </main>
+  );
+}
+
+function TradeItem({ trade, index }: { trade: Trade, index: number }) {
+  return (
+    <motion.div 
+      initial={{ opacity: 0 }}
+      whileInView={{ opacity: 1 }}
+      viewport={{ once: true }}
+      className="group grid grid-cols-1 md:grid-cols-12 border-b border-subtle hover:bg-accent hover:text-white transition-colors duration-0 cursor-pointer"
+    >
+      {/* 01. ID */}
+      <div className="col-span-2 p-4 font-mono text-xs border-r border-subtle group-hover:border-transparent flex items-center">
+        {String(index + 1).padStart(3, '0')}
+      </div>
+
+      {/* 02. Instrument (Gros caractères) */}
+      <div className="col-span-4 p-3 border-r border-subtle group-hover:border-transparent flex items-center">
+        <span className="text-3xl font-bold tracking-tight">{trade.symbol}</span>
+      </div>
+
+      {/* 03. Setup */}
+      <div className="col-span-2 p-4 font-mono text-xs border-r border-subtle group-hover:border-transparent flex items-center uppercase">
+        {trade.setup}
+      </div>
+
+      {/* 04. Date */}
+      <div className="col-span-2 p-4 font-mono text-xs border-r border-subtle group-hover:border-transparent flex items-center">
+        {trade.date}
+      </div>
+
+      {/* 05. PnL */}
+      <div className="col-span-2 p-4 flex items-center justify-end gap-2">
+        <span className="font-mono text-lg">
+          {trade.pnl > 0 ? '+' : ''}{trade.pnl}
+        </span>
+        <ArrowUpRight className="w-4 h-4" />
+      </div>
+    </motion.div>
   );
 }

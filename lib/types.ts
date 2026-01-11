@@ -2,10 +2,12 @@ export interface Trade {
   id: string;
   symbol: string; // Ex: NQ, ES
   direction: 'LONG' | 'SHORT';
+  contracts: number;
   entryPrice: number;
   exitPrice: number;
   pnl: number;
-  setup: string; // Ex: MSNR Reversal
+  rr: number;
+  setup: string;
   status: 'WIN' | 'LOSS' | 'BE';
   date: string;
   screenshot?: string;

@@ -9,21 +9,23 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        background: "#000000", // Noir pur
-        foreground: "#ffffff", // Blanc pur
-        neutral: "#1a1a1a",    // Gris très sombre pour les éléments secondaires
-        accent: "#ff3333",     // Rouge Suisse International
+        background: "#FFFFFF", // Fond blanc pur
+        paper: "#000000",      // Texte noir profond
+        subtle: "#E5E5E5",     // Gris très clair pour les lignes de grille
+        accent: "#FF3B30",     // "Swiss Red" (Vibrant et signalétique)
       },
       fontFamily: {
-        sans: ['var(--font-inter)', 'Helvetica', 'Arial', 'sans-serif'], // Le style Suisse repose sur du sans-serif propre
+        sans: ['var(--font-inter)', 'Helvetica Neue', 'Arial', 'sans-serif'], // Priorité à la lisibilité
         mono: ['var(--font-jetbrains)', 'monospace'],
       },
       fontSize: {
-        'display': ['8rem', { lineHeight: '0.9', letterSpacing: '-0.04em' }], // Pour les titres géants
-        'huge': ['4rem', { lineHeight: '1', letterSpacing: '-0.02em' }],
+        'huge': ['14vw', { lineHeight: '0.8', letterSpacing: '-0.04em' }], // Plus serré et plus grand
       },
-      backgroundImage: {
-        'grid-pattern': "linear-gradient(to right, #1a1a1a 1px, transparent 1px), linear-gradient(to bottom, #1a1a1a 1px, transparent 1px)",
+      gridTemplateColumns: {
+        '12': 'repeat(12, minmax(0, 1fr))', // Grille 12 colonnes explicite
+      },
+      spacing: {
+        'grid-gap': '1px', // Pour créer les lignes de grille via gap
       }
     },
   },
